@@ -1,0 +1,7 @@
+{
+  "name": "Online Karobar Dost",
+  "description": "A comprehensive business management app for small online business owners in Pakistan, featuring inventory management, order tracking, AI expense tracking, and CRM.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

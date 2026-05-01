@@ -1,0 +1,142 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "Product category definition",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique category ID" },
+        "name": { "type": "string", "description": "Category name" }
+      },
+      "required": ["id", "name"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Inventory product item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "costPrice": { "type": "number" },
+        "stock": { "type": "number" },
+        "lowStockThreshold": { "type": "number" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "defaultDiscount": { "type": "number" },
+        "defaultDiscountType": { "type": "string", "enum": ["percentage", "fixed"] },
+        "isDamaged": { "type": "boolean" }
+      },
+      "required": ["id", "name", "price", "costPrice", "stock", "lowStockThreshold"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Business customer details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "email": { "type": "string" }
+      },
+      "required": ["id", "name", "phone", "address"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Sales order record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productId": { "type": "string" },
+              "name": { "type": "string" },
+              "quantity": { "type": "number" },
+              "price": { "type": "number" }
+            }
+          }
+        },
+        "totalAmount": { "type": "number" },
+        "discountAmount": { "type": "number" },
+        "discountType": { "type": "string", "enum": ["percentage", "fixed"] },
+        "status": { "type": "string" },
+        "date": { "type": "string" },
+        "currency": { "type": "string" },
+        "exchangeRate": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "courierService": { "type": "string" },
+        "trackingNumber": { "type": "string" },
+        "uid": { "type": "string", "description": "Owner UID" }
+      },
+      "required": ["id", "customerId", "customerName", "items", "totalAmount", "status", "date", "currency", "exchangeRate", "uid"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Business expense record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "amount": { "type": "number" },
+        "category": { "type": "string" },
+        "date": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "confidenceScore": { "type": "number" },
+        "currency": { "type": "string" },
+        "exchangeRate": { "type": "number" },
+        "uid": { "type": "string" }
+      },
+      "required": ["id", "name", "amount", "category", "date", "currency", "exchangeRate", "uid"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Business configuration",
+      "type": "object",
+      "properties": {
+        "primaryCurrency": { "type": "string" },
+        "currencySymbol": { "type": "string" },
+        "businessName": { "type": "string" },
+        "whatsappNumber": { "type": "string" },
+        "businessAddress": { "type": "string" },
+        "defaultDeliveryCharges": { "type": "number" },
+        "preferredCouriers": { "type": "array", "items": { "type": "string" } },
+        "bankName": { "type": "string" },
+        "accountTitle": { "type": "string" },
+        "easyPaisaNumber": { "type": "string" },
+        "jazzCashNumber": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Global product categories"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Global product inventory"
+    },
+    "/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customer database"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Sales orders"
+    },
+    "/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Business expenses"
+    },
+    "/settings/business": {
+      "schema": "Settings",
+      "description": "Global business settings"
+    }
+  }
+}
