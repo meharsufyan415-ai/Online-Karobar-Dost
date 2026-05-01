@@ -7,6 +7,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
+    // If you are deploying to GitHub Pages (e.g. username.github.io/repo-name/), 
+    // set base to '/repo-name/'. Otherwise leave as '/' or './'.
+    base: './', 
     plugins: [
       react(), 
       tailwindcss(),
@@ -18,6 +21,11 @@ export default defineConfig(({ mode }) => {
           short_name: 'Karobar Dost',
           description: 'آنلائن کاروبار دوست - Digital Business Management',
           theme_color: '#00695C',
+          background_color: '#00695C',
+          display: 'standalone',
+          orientation: 'portrait',
+          scope: '/',
+          start_url: '/',
           icons: [
             {
               src: 'logo.png',
