@@ -30,6 +30,7 @@ import {
   setDoc, 
   deleteDoc, 
   query, 
+  where,
   orderBy, 
   User,
   handleFirestoreError,
@@ -89,27 +90,27 @@ export default function App() {
     setIsLoading(true);
 
     const unsubscribers = [
-      onSnapshot(collection(db, 'products'), (snapshot) => {
+      onSnapshot(query(collection(db, 'products'), where('uid', '==', user.uid)), (snapshot) => {
         setProducts(snapshot.docs.map(doc => doc.data() as Product));
       }, (err) => handleFirestoreError(err, OperationType.LIST, 'products')),
 
-      onSnapshot(query(collection(db, 'orders'), orderBy('date', 'desc')), (snapshot) => {
+      onSnapshot(query(collection(db, 'orders'), where('uid', '==', user.uid), orderBy('date', 'desc')), (snapshot) => {
         setOrders(snapshot.docs.map(doc => doc.data() as Order));
       }, (err) => handleFirestoreError(err, OperationType.LIST, 'orders')),
 
-      onSnapshot(collection(db, 'customers'), (snapshot) => {
+      onSnapshot(query(collection(db, 'customers'), where('uid', '==', user.uid)), (snapshot) => {
         setCustomers(snapshot.docs.map(doc => doc.data() as Customer));
       }, (err) => handleFirestoreError(err, OperationType.LIST, 'customers')),
 
-      onSnapshot(query(collection(db, 'expenses'), orderBy('date', 'desc')), (snapshot) => {
+      onSnapshot(query(collection(db, 'expenses'), where('uid', '==', user.uid), orderBy('date', 'desc')), (snapshot) => {
         setExpenses(snapshot.docs.map(doc => doc.data() as Expense));
       }, (err) => handleFirestoreError(err, OperationType.LIST, 'expenses')),
 
-      onSnapshot(collection(db, 'categories'), (snapshot) => {
+      onSnapshot(query(collection(db, 'categories'), where('uid', '==', user.uid)), (snapshot) => {
         setCategories(snapshot.docs.map(doc => doc.data() as Category));
       }, (err) => handleFirestoreError(err, OperationType.LIST, 'categories')),
 
-      onSnapshot(doc(db, 'settings', 'business'), (snapshot) => {
+      onSnapshot(doc(db, 'settings', user.uid), (snapshot) => {
         if (snapshot.exists()) {
           setSettings(snapshot.data() as BusinessSettings);
         } else {
@@ -117,15 +118,15 @@ export default function App() {
           const defaultSettings: BusinessSettings = {
             primaryCurrency: 'PKR',
             currencySymbol: 'Rs.',
-            businessName: 'My Business',
+            businessName: user.displayName || 'My Business',
             whatsappNumber: '',
             businessAddress: '',
             defaultDeliveryCharges: 0,
             preferredCouriers: []
           };
-          setDoc(doc(db, 'settings', 'business'), defaultSettings);
+          setDoc(doc(db, 'settings', user.uid), defaultSettings);
         }
-      }, (err) => handleFirestoreError(err, OperationType.GET, 'settings/business'))
+      }, (err) => handleFirestoreError(err, OperationType.GET, `settings/${user.uid}`))
     ];
 
     setIsLoading(false);
@@ -191,7 +192,7 @@ export default function App() {
 
     try {
       for (const p of addedOrUpdated) {
-        await setDoc(doc(db, 'products', p.id), p);
+        await setDoc(doc(db, 'products', p.id), { ...p, uid: user?.uid });
       }
       for (const p of deleted) {
         await deleteDoc(doc(db, 'products', p.id));
@@ -220,7 +221,7 @@ export default function App() {
     
     try {
       for (const c of addedOrUpdated) {
-        await setDoc(doc(db, 'customers', c.id), c);
+        await setDoc(doc(db, 'customers', c.id), { ...c, uid: user?.uid });
       }
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, 'customers');
@@ -251,7 +252,7 @@ export default function App() {
 
     try {
       for (const c of addedOrUpdated) {
-        await setDoc(doc(db, 'categories', c.id), c);
+        await setDoc(doc(db, 'categories', c.id), { ...c, uid: user?.uid });
       }
       for (const c of deleted) {
         await deleteDoc(doc(db, 'categories', c.id));
@@ -262,12 +263,12 @@ export default function App() {
   };
 
   const handleSetSettings = async (action: React.SetStateAction<BusinessSettings>) => {
-    if (!settings) return;
+    if (!settings || !user) return;
     const next = typeof action === 'function' ? action(settings) : action;
     try {
-      await setDoc(doc(db, 'settings', 'business'), next);
+      await setDoc(doc(db, 'settings', user.uid), next);
     } catch (err) {
-      handleFirestoreError(err, OperationType.WRITE, 'settings/business');
+      handleFirestoreError(err, OperationType.WRITE, `settings/${user.uid}`);
     }
   };
 

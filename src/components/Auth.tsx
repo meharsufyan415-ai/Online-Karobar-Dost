@@ -62,7 +62,7 @@ export default function Auth({ onLoginSuccess }: AuthProps) {
           defaultDeliveryCharges: 0,
           preferredCouriers: []
         };
-        await setDoc(doc(db, 'settings', 'business'), initialSettings);
+        await setDoc(doc(db, 'settings', userCredential.user.uid), initialSettings);
         
         onLoginSuccess();
       } else if (mode === 'login') {
